@@ -12,6 +12,12 @@ export interface IdsDataGridColumnFormatOptions {
   timeStyle?: string
   /** Date format to use for parsing ect */
   dateFormat?: string
+  /** year pattern for Intl.DateTimeFormat */
+  year?: string;
+  /** month pattern for Intl.DateTimeFormat */
+  month?: string;
+  /** day pattern for Intl.DateTimeFormat */
+  day?: string;
 }
 
 export interface IdsDataGridColumnGroup {
@@ -216,4 +222,6 @@ export interface IdsDataGridColumn {
     editor?: IdsDataGridEditor,
     editorSettings?: Record<string, unknown>
   }
+  /** If a true will set the text to uppercase */
+  uppercase?: boolean | 'true' | ((type: 'body-cell' | 'header-cell', col: IdsDataGridColumn, index?: number, value?: any, item?: Record<string, any>) => boolean);
 }

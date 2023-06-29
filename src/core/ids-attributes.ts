@@ -63,6 +63,7 @@ export const attributes = {
   CAPTURES_FOCUS: 'captures-focus',
   CARD_HEIGHT: 'card-height',
   CARD_WIDTH: 'card-width',
+  CATEGORY: 'category',
   CATEGORY_PERCENTAGE: 'category-percentage',
   CHARACTER_COUNTER: 'character-counter',
   CHAR_MAX_TEXT: 'char-max-text',
@@ -171,6 +172,7 @@ export const attributes = {
   FONT_WEIGHT: 'font-weight',
   FORMAT: 'format',
   FORMATTER_WIDTH: 'formatter-width',
+  FULL_HEIGHT: 'full-height',
   FULLSIZE: 'fullsize',
   GAP: 'gap',
   GAP_X: 'gap-x',
@@ -392,9 +394,11 @@ export const attributes = {
   SHOW_CANCEL: 'show-cancel',
   SHOW_CLEAR: 'show-clear',
   SHOW_DETAILS: 'show-details',
+  SHOW_HEADER_EXPANDER: 'show-header-expander',
   SHOW_HORIZONTAL_GRID_LINES: 'show-horizontal-grid-lines',
   SHOW_LABEL: 'show-label',
   SHOW_LEGEND: 'show-legend',
+  SHOW_LOADING_INDICATOR: 'show-loading-indicator',
   SHOW_PICKLIST_MONTH: 'show-picklist-month',
   SHOW_PICKLIST_WEEK: 'show-picklist-week',
   SHOW_PICKLIST_YEAR: 'show-picklist-year',
@@ -402,12 +406,13 @@ export const attributes = {
   SHOW_TODAY: 'show-today',
   SHOW_TOOLTIP: 'show-tooltip',
   SHOW_VERTICAL_GRID_LINES: 'show-vertical-grid-lines',
-  SHOW_LOADING_INDICATOR: 'show-loading-indicator',
+  SHOW_WEEK_NUMBERS: 'show-week-numbers',
   SHRINK: 'shrink',
   SIZE: 'size',
   SORTABLE: 'sortable',
   SOURCE_FORMATTER: 'source-formatter',
   SQUARE: 'square',
+  SELF_MANAGED: 'self-managed',
   SRC: 'src',
   STACKED: 'stacked',
   STARS: 'stars',
@@ -528,7 +533,7 @@ export const prefix = {
   PREFIX: 'ids'
 };
 
-export const version = '1.0.0-beta.10';
+export const version = '1.0.0-beta.12';
 
 export enum IdsDirection {
   Up = 'up',

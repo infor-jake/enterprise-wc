@@ -167,19 +167,19 @@ export default class IdsDataGridFilters {
     if (!this.#initial[column.id].datePicker) this.#initial[column.id].datePicker = { value };
     value = value ? ` value="${value}"` : '';
 
-    return `
-      ${this.#filterButtonTemplate(TYPE, column)}
-      ${this.#triggerFieldTemplate(TYPE, column, 'calendar', 'DatePickerTriggerButton')}
-      <ids-date-picker-popup
-        attachment=".ids-data-grid-wrapper"
-        data-filter-type="${TYPE}"
-        trigger-type="click"
-        id="popup-${id}"
-        no-margins
-        compact="true"
-        ${format}${showToday}${firstDayOfWeek}${value}${disabled}
-      ></ids-date-picker-popup>
-    `;
+    const filterButton = `${this.#filterButtonTemplate(TYPE, column)}`;
+    const trigger = `${this.#triggerFieldTemplate(TYPE, column, 'calendar', 'DatePickerTriggerButton')}`;
+    const popup = `<ids-date-picker-popup
+      attachment=".ids-data-grid-wrapper"
+      data-filter-type="${TYPE}"
+      trigger-type="click"
+      id="popup-${id}"
+      no-margins
+      compact="true"
+      ${format}${showToday}${firstDayOfWeek}${value}${disabled}></ids-date-picker-popup>`;
+
+    if (column.align === 'right') return `${trigger}${filterButton}${popup}`;
+    return `${filterButton}${trigger}${popup}`;
   }
 
   /**
@@ -207,10 +207,9 @@ export default class IdsDataGridFilters {
     if (!this.#initial[column.id].timePicker) this.#initial[column.id].timePicker = { value };
     value = value ? ` value="${value}"` : '';
 
-    return `
-      ${this.#filterButtonTemplate(TYPE, column)}
-      ${this.#triggerFieldTemplate(TYPE, column, 'clock', 'TimePickerTriggerButton')}
-      <ids-time-picker-popup
+    const filterButton = `${this.#filterButtonTemplate(TYPE, column)}`;
+    const trigger = `${this.#triggerFieldTemplate(TYPE, column, 'clock', 'TimePickerTriggerButton')}`;
+    const popup = `<ids-time-picker-popup
         attachment=".ids-data-grid-wrapper"
         trigger-type="click"
         color-variant="${!this.root.listStyle ? 'alternate-formatter' : 'alternate-list-formatter'}"
@@ -223,8 +222,10 @@ export default class IdsDataGridFilters {
         compact
         ${format}${placeholder}${minuteInterval}${secondInterval}
         ${autoselect}${autoupdate}${disabled}${readonly}${value}
-      ></ids-time-picker-popup>
-    `;
+      ></ids-time-picker-popup>`;
+
+    if (column?.align === 'right') return `${trigger}${filterButton}${popup}`;
+    return `${filterButton}${trigger}${popup}`;
   }
 
   /**
@@ -901,14 +902,14 @@ export default class IdsDataGridFilters {
 
     // Capture 'dayselected' events from IdsDatePickerPopup
     this.root.onEvent(`dayselected.${this.#id()}`, this.root.wrapper, (e: any) => {
+      // this will trigger the above change event which also calls applyFilter().
       e.target.value = e.detail.value;
-      this.applyFilter();
     });
 
     // Capture 'timeselected' events from IdsTimePickerPopup
     this.root.onEvent(`timeselected.${this.#id()}`, this.root.wrapper, (e: any) => {
+      // this will trigger the above change event which also calls applyFilter().
       e.target.value = e.detail.value;
-      this.applyFilter();
     });
 
     // Change event for ids-date-picker and ids-time-picker
@@ -992,10 +993,12 @@ export default class IdsDataGridFilters {
    * @returns {string} The resulting template
    */
   #btnAndInputTemplate(type: string, column: IdsDataGridColumn) {
-    return `
-      ${this.#filterButtonTemplate(type, column)}
-      ${this.#inputTemplate(type, column)}
-    `;
+    const input = `${this.#inputTemplate(type, column)}`;
+    const button = `${this.#filterButtonTemplate(type, column)}`;
+    if (column.align === 'right') {
+      return `${input}${button}`;
+    }
+    return `${button}${input}`;
   }
 
   /**
@@ -1079,7 +1082,9 @@ export default class IdsDataGridFilters {
       size="${opt.size || 'full'}"
       label="${label}"
       label-state="collapsed"
+      ${this.root.rowHeight === 'xxs' || this.root.rowHeight === 'xxs' ? `field-height="xs"` : ''}
       id="${id}"
+      text-align="${column.align === 'right' ? 'end' : 'start'}"
       no-margins
       compact
       ${placeholder}${disabled}${readonly}${value}>
@@ -1169,6 +1174,12 @@ export default class IdsDataGridFilters {
     }
     if (!sel) sel = operators[0];
     const value = (sel?.value || sel?.value === '') ? ` value="${sel.value}"` : '';
+    const isUppercase = (): boolean => {
+      if (typeof column?.uppercase === 'function') return column.uppercase('header-cell', column);
+      return (column?.uppercase === 'true' || column?.uppercase === true);
+    };
+    const uppercaseClass = isUppercase() ? ' uppercase' : '';
+
     this.#initial[column.id] = this.#initial[column.id] || {};
     if (!this.#initial[column.id].dropdown) this.#initial[column.id].dropdown = { ...sel };
 
@@ -1187,7 +1198,7 @@ export default class IdsDataGridFilters {
       >
       </ids-dropdown>
       <ids-dropdown-list id="${id}-list">
-        <ids-list-box>${items}</ids-list-box>
+        <ids-list-box${uppercaseClass}>${items}</ids-list-box>
       </ids-dropdown-list>
     `;
   }

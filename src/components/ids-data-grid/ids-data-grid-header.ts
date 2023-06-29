@@ -12,6 +12,11 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
 
   headerCheckbox?: HTMLElement;
 
+  /**
+   * Tracks the state of the header expander
+   */
+  isHeaderExpanderCollapsed = false;
+
   constructor() {
     super({ noShadowRoot: true });
     this.state = {
@@ -57,6 +62,16 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
         return;
       }
 
+      // Expander collapse/expand all expandable or tree rows
+      if (e.target?.classList?.contains('header-expander')) {
+        if (!this.dataGrid?.showHeaderExpander) return;
+
+        if (this.isHeaderExpanderCollapsed) this.dataGrid.expandAll();
+        else this.dataGrid.collapseAll();
+        this.isHeaderExpanderCollapsed = !this.isHeaderExpanderCollapsed;
+        return;
+      }
+
       const sortableHeaderCell = e.target.closest('.is-sortable')?.closest('.ids-data-grid-header-cell');
       if (sortableHeaderCell) {
         this.dataGrid?.setSortColumn(
@@ -94,6 +109,7 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
     let x = 0;
     let w = 0;
     let columnId = '';
+    let columnElem: HTMLElement;
 
     const mouseMoveHandler = (e: MouseEvent) => {
       // Determine how far the mouse has been moved
@@ -109,7 +125,8 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
 
       this?.style.setProperty('cursor', '');
       requestAnimationFrame(() => {
-        this.dataGrid!.isResizing = false;
+        this.dataGrid.isResizing = false;
+        columnElem?.parentElement?.querySelectorAll('[draggable]').forEach((el: Element) => el.setAttribute('draggable', 'true'));
       });
     };
 
@@ -125,9 +142,11 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
       x = e.clientX;
 
       // Calculate the current width of column
-      const col = target.closest('.ids-data-grid-header-cell');
-      const colStyles = window.getComputedStyle(col);
-      columnId = col.getAttribute('column-id');
+      columnElem = target.closest('.ids-data-grid-header-cell') as HTMLElement;
+      columnElem.parentElement?.querySelectorAll('[draggable]').forEach((el) => el.setAttribute('draggable', 'false'));
+
+      const colStyles = window.getComputedStyle(columnElem);
+      columnId = columnElem.getAttribute('column-id') || '';
       w = parseInt(colStyles.width, 10);
 
       // Attach listeners for document's events
@@ -138,7 +157,7 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
       this?.style.setProperty('cursor', 'col-resize');
 
       // Prevent a click causing a sort
-      this.dataGrid!.isResizing = true;
+      this.dataGrid.isResizing = true;
     });
   }
 
@@ -153,32 +172,24 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
     let dragInitiated = false;
 
     // Style the Dragger
-    this.offEvent('dragstart.resize', this);
-    this.onEvent('dragstart.resize', this, (e: DragEvent) => {
+    this.offEvent('dragstart.reorder', this);
+    this.onEvent('dragstart.reorder', this, (e: DragEvent) => {
+      if (this.dataGrid.isResizing) return;
       const target = (e.target as any);
-      if (!target.classList.contains('reorderer')) {
-        return;
-      }
-
       dragInitiated = true;
-      target.parentNode.classList.add('active-drag-column');
-      dragger = target.parentNode.cloneNode(true);
+      target.classList.add('active-drag-column');
+      dragger = target.cloneNode(true);
       dragger.classList.add('dragging');
-      dragger.style.position = 'absolute';
-      dragger.style.top = '0';
-      dragger.style.left = '-1000px';
 
       this?.appendChild(dragger);
       // Based on width of 110
       e?.dataTransfer?.setDragImage(dragger, this.dataGrid?.localeAPI.isRTL() ? 100 : 10, 18);
-
-      target.style.position = 'absolute';
-      startIndex = target.parentNode.getAttribute('aria-colindex');
+      startIndex = target.getAttribute('aria-colindex');
     });
 
     // Show the arrows
-    this.offEvent('dragenter.resize', this);
-    this.onEvent('dragenter.resize', this, (e: DragEvent) => {
+    this.offEvent('dragenter.reorder', this);
+    this.onEvent('dragenter.reorder', this, (e: DragEvent) => {
       if (!dragInitiated) {
         // Accept Dropped Text
         if ((e.target as HTMLElement)?.getAttribute('color-variant') === 'alternate-formatter') {
@@ -193,24 +204,28 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
       const curIndex = cell.getAttribute('aria-colindex');
       const cellLeft = rect.left + (startIndex < curIndex ? rect.width + 1 : 1);
       const cellRight = rect.left + (startIndex < curIndex ? 1 : rect.width + 1);
-
-      dragArrows?.style.setProperty('left', `${this.dataGrid?.localeAPI.isRTL() ? cellRight : cellLeft}px`);
-      dragArrows?.style.setProperty('height', `${rect.height}px`);
+      let offsetLeft = 0;
+      if (this.offsetParent) {
+        offsetLeft = this.offsetParent.getBoundingClientRect().left
+          - (this.offsetParent as HTMLElement).offsetLeft;
+      }
+      dragArrows?.style.setProperty('left', `${this.dataGrid?.localeAPI.isRTL() ? cellRight - offsetLeft : cellLeft - offsetLeft}px`);
+      dragArrows?.style.setProperty('height', `${rect.height - 1}px`);
       dragArrows?.style.setProperty('display', 'block');
 
       e.preventDefault();
     });
 
     // Use a normal cursor (not drag and drop)
-    this.offEvent('dragover.resize', this);
-    this.onEvent('dragover.resize', this, (e: DragEvent) => {
+    this.offEvent('dragover.reorder', this);
+    this.onEvent('dragover.reorder', this, (e: DragEvent) => {
       if (!dragInitiated) return;
       e.dataTransfer!.dropEffect = 'move';
       e.preventDefault();
     });
 
-    this.offEvent('dragleave.resize', this);
-    this.onEvent('dragleave.resize', this, (e: DragEvent) => {
+    this.offEvent('dragleave.reorder', this);
+    this.onEvent('dragleave.reorder', this, (e: DragEvent) => {
       if (!dragInitiated && (e.target as HTMLElement)?.getAttribute('color-variant') === 'alternate-formatter') {
         (e.target as any).style.backgroundColor = '';
       }
@@ -224,8 +239,8 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
     };
 
     // Set everything temp element back to normal
-    this.offEvent('dragend.resize', this);
-    this.onEvent('dragend.resize', this, (e: DragEvent) => {
+    this.offEvent('dragend.reorder', this);
+    this.onEvent('dragend.reorder', this, (e: DragEvent) => {
       if (!dragInitiated) {
         if ((e.target as HTMLElement)?.getAttribute('color-variant') === 'alternate-formatter') {
           (e.target as any).style.backgroundColor = '';
@@ -236,8 +251,8 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
       removeDragger(e);
     });
 
-    this.offEvent('drop.resize', this);
-    this.onEvent('drop.resize', this, (e: DragEvent) => {
+    this.offEvent('drop.reorder', this);
+    this.onEvent('drop.reorder', this, (e: DragEvent) => {
       if (!dragInitiated) {
         if ((e.target as HTMLElement)?.getAttribute('color-variant') === 'alternate-formatter') {
           (e.target as any).style.backgroundColor = '';
@@ -249,6 +264,16 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
       this.dataGrid?.moveColumn(startIndex - 1, cell.getAttribute('aria-colindex') - 1);
       removeDragger(e);
     });
+  }
+
+  /**
+   * Set header expander state
+   */
+  setIsHeaderExpanderCollapsed() {
+    if (!this.dataGrid?.showHeaderExpander) return;
+    const all = this.dataGrid?.rows?.filter((r: any) => r?.hasAttribute('aria-expanded')) || [];
+    const collapsedRows = all.filter((r: any) => r?.getAttribute('aria-expanded') === 'false');
+    if (all.length && all.length === collapsedRows.length) this.isHeaderExpanderCollapsed = true;
   }
 
   /**
@@ -354,8 +379,12 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
       </span>
     `;
 
+    const expanderTemplate = `<ids-icon class="header-expander" icon="plusminus-folder-closed"></ids-icon>`;
+
     const resizerTemplate = `<span class="resizer"></span>`;
-    const reorderTemplate = `<div class="reorderer" draggable="true"><ids-icon icon="drag" size="medium"></ids-icon></div>`;
+    const reorderTemplate = `<div class="reorderer"><ids-icon icon="drag" size="medium"></ids-icon></div>`;
+
+    const expander = /^(expander|tree)$/g.test(column.formatter?.name || '') ? expanderTemplate : '';
 
     const selectionCheckbox = column.id !== 'selectionRadio' && column.id === 'selectionCheckbox';
     const colName = escapeHTML(column.name);
@@ -372,6 +401,7 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
 
     // Content row cell template
     const headerContentWrapperTemplate = `<span class="${cssClasses}">
+        ${expander}
         <span class="ids-data-grid-header-text">
           ${headerContentTemplate}
         </span>
@@ -390,10 +420,17 @@ export default class IdsDataGridHeader extends IdsEventsMixin(IdsElement) {
     const lastFrozen = dataGrid?.leftFrozenColumns.length;
     const frozen = column?.frozen ? ` frozen frozen-${column?.frozen}${index + 1 === lastFrozen ? ' frozen-last' : ''}` : '';
 
+    const isUppercase = (): boolean => {
+      if (typeof column?.uppercase === 'function') return column.uppercase('header-cell', column, index);
+      return (column?.uppercase === 'true' || column?.uppercase === true);
+    };
+    const uppercaseClass = isUppercase() ? ' is-uppercase' : '';
+
     // Header cell template
     const html = `
       <span
-        class="ids-data-grid-header-cell${align}${frozen}"
+        class="ids-data-grid-header-cell${uppercaseClass}${align}${frozen}"
+        ${column.reorderable ? 'draggable="true"' : ''}
         part="header-cell"
         aria-colindex="${index + 1}"
         column-id="${column.id}"

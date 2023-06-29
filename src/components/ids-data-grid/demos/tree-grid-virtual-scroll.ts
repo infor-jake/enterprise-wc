@@ -2,6 +2,7 @@ import type IdsDataGrid from '../ids-data-grid';
 import '../ids-data-grid';
 import type { IdsDataGridColumn } from '../ids-data-grid-column';
 import treeLargeJSON from '../../../assets/data/tree-large.json';
+import '../../ids-layout-flex/ids-layout-flex';
 
 // Example for populating the DataGrid
 const dataGrid = document.querySelector<IdsDataGrid>('#tree-grid-virtual-scroll')!;
@@ -88,11 +89,15 @@ dataGrid.columns = columns;
 const setData = async () => {
   const res = await fetch(url);
   const data = await res.json();
-  dataGrid.data = data;
+  dataGrid.data = data.splice(0, 120);
 };
 
 setData();
 
 dataGrid.addEventListener('selectionchanged', (e: Event) => {
   console.info(`Selection Changed`, (<CustomEvent>e).detail);
+});
+
+dataGrid.addEventListener('scrollend', (e: Event) => {
+  console.info(`scrollend`, (<CustomEvent>e).detail);
 });

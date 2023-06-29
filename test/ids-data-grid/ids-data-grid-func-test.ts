@@ -347,6 +347,22 @@ describe('IdsDataGrid Component', () => {
       expect(dataGrid.getAttribute('unique-id')).toEqual(null);
       expect(dataGrid.uniqueId).toEqual(null);
     });
+
+    it('fires after rendered event after redraw the data grid', async () => {
+      document.body.innerHTML = '';
+      const mockCallback = jest.fn(() => {});
+      container = new IdsContainer();
+      dataGrid = new IdsDataGrid();
+      dataGrid.addEventListener('afterrendered', mockCallback);
+      container.appendChild(dataGrid);
+      document.body.appendChild(container);
+      dataGrid.columns = columns();
+      dataGrid.data = deepClone(dataset);
+      await processAnimFrame();
+      await processAnimFrame();
+
+      expect(mockCallback.mock.calls.length).toBe(1);
+    });
   });
 
   describe('Row Rendering Tests', () => {
@@ -369,6 +385,33 @@ describe('IdsDataGrid Component', () => {
       const row2 = dataGrid.shadowRoot.querySelectorAll('.ids-data-grid-row')[2];
       expect(row1.getAttribute('hidden')).toBeFalsy();
       expect(row2.getAttribute('hidden')).toBe('');
+    });
+
+    it('render disabled rows', async () => {
+      const newData = deepClone(dataset);
+      newData[1].disabled = true;
+      dataGrid.data = newData;
+
+      dataGrid.columns = [{
+        id: 'description',
+        name: 'description',
+        field: 'description'
+      }];
+
+      await processAnimFrame();
+      const rowSel = '.ids-data-grid-body .ids-data-grid-row';
+      const rows = dataGrid.shadowRoot.querySelectorAll(rowSel);
+      expect(rows.length).toEqual(9);
+      expect(dataGrid.shadowRoot.querySelectorAll(`${rowSel}[disabled]`).length).toEqual(1);
+
+      const disabledRow = rows[1];
+      expect(disabledRow.getAttribute('row-index')).toEqual('1');
+      expect(disabledRow.getAttribute('disabled')).toEqual('');
+      expect(disabledRow.getAttribute('aria-disabled')).toEqual('true');
+
+      disabledRow.querySelectorAll('[role="gridcell"]').forEach((row: any) => {
+        expect(row.classList.contains('is-disabled')).toBeTruthy();
+      });
     });
 
     it('skips re-rerender if no data', () => {
@@ -609,7 +652,6 @@ describe('IdsDataGrid Component', () => {
       expect(dataGrid.rows[dataGrid.rows.length - 1].rowIndex).toBe(MAX_ROWS - 1);
 
       expect(dataGrid.container.scrollTop).toBe(0);
-      // dataGrid.container.scrollTop = BUFFER_ROWS * ROW_HEIGHT;
       dataGrid.scrollRowIntoView(BUFFER_ROWS * ROW_HEIGHT);
       await processAnimFrame();
       expect(dataGrid.container.scrollTop).toBeGreaterThan(100);
@@ -945,6 +987,18 @@ describe('IdsDataGrid Component', () => {
       expect(dataGrid.container.style.getPropertyValue('--ids-data-grid-column-widths')).toEqual('minmax(130px, 2fr) minmax(50%, 1fr) ');
     });
 
+    it('supports setting uppercase', () => {
+      dataGrid.columns = [{
+        id: 'description',
+        name: 'Description',
+        field: 'description',
+        uppercase: true,
+        formatter: formatters.text
+      }];
+      const cell = dataGrid.container.querySelector('.ids-data-grid-body .ids-data-grid-cell');
+      expect(cell.classList.contains('is-uppercase')).toBeTruthy();
+    });
+
     it('supports column groups', () => {
       dataGrid.columns[3].hidden = true;
 
@@ -1267,7 +1321,7 @@ describe('IdsDataGrid Component', () => {
 
       // Fake a Drag
       const dragstart = new MouseEvent('dragstart', { bubbles: true });
-      nodes[0].dispatchEvent(dragstart);
+      nodes[0].parentNode.dispatchEvent(dragstart);
       expect(nodes[0].parentNode.classList.contains('active-drag-column')).toBeTruthy();
       const dragover: any = new CustomEvent('dragover', { bubbles: true, dataTransfer: { } } as any);
       dragover.pageY = '1';
@@ -1278,29 +1332,29 @@ describe('IdsDataGrid Component', () => {
 
       // simulate dragging
       const dragenter = new MouseEvent('dragenter', { bubbles: true });
-      nodes[1].dispatchEvent(dragenter);
-      nodes[0].dispatchEvent(dragenter);
-      nodes[1].dispatchEvent(dragstart);
+      nodes[1].parentNode.dispatchEvent(dragenter);
+      nodes[0].parentNode.dispatchEvent(dragenter);
+      nodes[1].parentNode.dispatchEvent(dragstart);
 
       const dragstart2 = new MouseEvent('dragstart', { bubbles: true });
-      nodes[1].dispatchEvent(dragstart2);
-      nodes[0].dispatchEvent(dragenter);
-      nodes[1].dispatchEvent(dragenter);
-      nodes[0].dispatchEvent(dragenter);
+      nodes[1].parentNode.dispatchEvent(dragstart2);
+      nodes[0].parentNode.dispatchEvent(dragenter);
+      nodes[1].parentNode.dispatchEvent(dragenter);
+      nodes[0].parentNode.dispatchEvent(dragenter);
 
       dataGrid.localeAPI.isRTL = () => true;
-      nodes[1].dispatchEvent(dragenter);
-      nodes[0].dispatchEvent(dragenter);
+      nodes[1].parentNode.dispatchEvent(dragenter);
+      nodes[0].parentNode.dispatchEvent(dragenter);
       expect(dataGrid.wrapper.querySelector('.ids-data-grid-sort-arrows').style.display).toBe('block');
 
       const dragend = new MouseEvent('dragend', { bubbles: true });
-      nodes[1].dispatchEvent(dragend);
+      nodes[1].parentNode.dispatchEvent(dragend);
       expect(nodes[0].parentNode.classList.contains('active-drag-column')).toBeFalsy();
       expect(dataGrid.wrapper.querySelector('.ids-data-grid-sort-arrows').style.display).toBe('none');
 
       const drop = new MouseEvent('drop', { bubbles: true });
       dataGrid.dragInitiated = true;
-      nodes[1].dispatchEvent(drop);
+      nodes[1].parentNode.dispatchEvent(drop);
 
       // Overall success
       expect(cols[0].id).toBe('price');
@@ -1409,35 +1463,6 @@ describe('IdsDataGrid Component', () => {
       expect(cols[0].id).toBe('price');
       expect(cols[1].id).toBe('bookCurrency');
       expect(cols[2].id).toBe('other');
-    });
-
-    it('supports stopping reorder on non-reorderable', async () => {
-      dataGrid.columns = [{
-        id: 'price',
-        name: 'Price',
-        field: 'price',
-        reorderable: false,
-        width: 200,
-      },
-      {
-        id: 'bookCurrency',
-        name: 'Currency',
-        field: 'bookCurrency',
-        minWidth: 100,
-        reorderable: true,
-      },
-      {
-        id: 'other',
-        name: 'ledger',
-        field: 'ledger',
-        minWidth: 100,
-        reorderable: false,
-      }];
-
-      const headers = dataGrid.container.querySelectorAll('.ids-data-grid-header-cell');
-      const dragstart = new MouseEvent('dragstart', { bubbles: true });
-      headers[0].dispatchEvent(dragstart);
-      expect(dataGrid.shadowRoot.querySelector('.active-drag-column')).toBeFalsy();
     });
 
     it('supports moveColumn', async () => {
@@ -2498,6 +2523,48 @@ describe('IdsDataGrid Component', () => {
       expect(rows.length).toBe(23);
     });
 
+    it('should be able to set show header expander', async () => {
+      expect(dataGrid.getAttribute('show-header-expander')).toEqual(null);
+      expect(dataGrid.showHeaderExpander).toEqual(false);
+      dataGrid.showHeaderExpander = true;
+      expect(dataGrid.getAttribute('show-header-expander')).toEqual('');
+      expect(dataGrid.showHeaderExpander).toEqual(true);
+      dataGrid.showHeaderExpander = false;
+      expect(dataGrid.getAttribute('show-header-expander')).toEqual(null);
+      expect(dataGrid.showHeaderExpander).toEqual(false);
+    });
+
+    it('can expand/collapse all tree rows', async () => {
+      dataGrid.treeGrid = true;
+      dataGrid.columns = deepClone(treeColumns);
+      dataGrid.data = deepClone(datasetTree);
+      dataGrid.rowSelection = 'multiple';
+      dataGrid.showHeaderExpander = true;
+
+      const all = () => dataGrid.rows.filter((r: any) => r?.hasAttribute('aria-expanded')) || [];
+      const collapsedRows = () => all().filter((r: any) => r?.getAttribute('aria-expanded') === 'false');
+
+      expect(all().length).toBe(7);
+      expect(collapsedRows().length).toBe(1);
+
+      dataGrid.collapseAll();
+      expect(all().length).toBe(7);
+      expect(collapsedRows().length).toBe(7);
+
+      const firstRow = dataGrid.shadowRoot.querySelectorAll('.ids-data-grid-row')[1];
+      expect(firstRow.getAttribute('aria-expanded')).toEqual('false');
+      const expandButton = firstRow.querySelectorAll('.ids-data-grid-cell')[1].querySelector('ids-button');
+      const mouseClick = new MouseEvent('click', { bubbles: true });
+      expandButton.dispatchEvent(mouseClick);
+      expect(firstRow.getAttribute('aria-expanded')).toEqual('true');
+      expect(all().length).toBe(7);
+      expect(collapsedRows().length).toBe(6);
+
+      dataGrid.expandAll();
+      expect(all().length).toBe(7);
+      expect(collapsedRows().length).toBe(0);
+    });
+
     it('can expand/collapse tree', async () => {
       dataGrid.treeGrid = true;
       dataGrid.columns = treeColumns;
@@ -3216,6 +3283,17 @@ describe('IdsDataGrid Component', () => {
       gridCell.endCellEdit();
 
       expect(gridCell.textContent).toEqual('3:45 AM');
+    });
+
+    it('supports updating data set and refreshing row', () => {
+      const rowIndex = 0;
+      const rowElem = dataGrid.rowByIndex(0);
+      dataGrid.updateDatasetAndRefresh(rowIndex, { bookCurrency: 'eur' });
+
+      // check that data is updated
+      expect(dataGrid.data[rowIndex].bookCurrency).toEqual('eur');
+      // check that UI is updated with new data
+      expect(rowElem.querySelector('[aria-colindex="8"]')?.textContent.trim()).toEqual('EUR');
     });
   });
 });

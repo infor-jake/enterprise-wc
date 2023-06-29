@@ -223,26 +223,63 @@ export default class IdsElement extends HTMLElement {
     document.body.querySelector('ids-theme-switcher')?.setAttribute('theme', theme);
   }
 
+  lastTheme = '';
+
   /**
    * Get the theme and load it
    * @param {string} theme name of the theme
    */
   async loadTheme(theme: string) {
-    await fetch(`../themes/ids-theme-${theme}.css`)
-      .then(async (data) => {
-        const themeStyles = await data.text();
+    // Reduce http requests
+    if (this.lastTheme === theme) return;
+    this.lastTheme = theme;
 
-        const head = (document.head as any);
-        const styleElem = document.querySelector('#ids-theme');
-        const style = styleElem || document.createElement('style');
-        style.textContent = themeStyles;
-        style.id = 'ids-theme';
-        if (this.nonce) style.setAttribute('nonce', this.nonce);
-        if (!styleElem) {
-          const titleElem = (head.querySelector('title') as HTMLElement);
-          if (titleElem) head.insertBefore(style, titleElem.nextElementSibling);
-          else head.insertAdjacentHTML('beforeend', style);
-        }
-      });
+    // Handle setting theme via links
+    document.querySelector('ids-container')?.setAttribute('hidden', '');
+    const themeLink = document.querySelector('link[href*="ids-theme"]');
+    if (themeLink) {
+      const href = themeLink.getAttribute('href');
+      const filename = href?.replace(/^.*[\\/]/, '') || '';
+      themeLink.setAttribute('href', href?.replace(filename, `ids-theme-${theme}.css`) || '');
+      return;
+    }
+
+    const isSelfManaged = document.querySelector('ids-theme-switcher[self-managed]');
+    if (isSelfManaged) return;
+
+    // Handle auto themes
+    const response = await fetch(`../themes/ids-theme-${theme}.css`, { cache: 'reload' });
+    const themeStyles = await response.text();
+    const head = (document.head as any);
+    const styleElem = document.querySelector('#ids-theme');
+    const style = styleElem || document.createElement('style');
+    style.textContent = themeStyles;
+    style.id = 'ids-theme';
+    if (this.nonce) style.setAttribute('nonce', this.nonce);
+    if (!styleElem) {
+      const titleElem = (head.querySelector('title') as HTMLElement);
+      if (titleElem) head.insertBefore(style, titleElem.nextElementSibling);
+      else head.insertAdjacentHTML('beforeend', style);
+    }
+    this.loadLegacyTheme(theme);
+    document.querySelector('ids-container')?.setAttribute('animated', '');
+    setTimeout(() => {
+      document.querySelector('ids-container')?.removeAttribute('hidden');
+    }, 150);
+  }
+
+  /**
+   * Switch the theme in 4.x components
+   * @param {string} value The theme value for example: default-light
+   */
+  loadLegacyTheme(value: string): void {
+    let styleSheet: any = document.querySelector('#stylesheet');
+    if (!styleSheet) styleSheet = document.querySelector('#sohoxi-stylesheet');
+    if (!styleSheet) return;
+
+    const href = styleSheet?.getAttribute('href');
+    const mappedTheme = value.replace('default', 'theme-new');
+    if (!href) return;
+    styleSheet?.setAttribute('href', href.replace('theme-new-light', mappedTheme).replace('theme-new-dark', mappedTheme).replace('theme-new-contrast', mappedTheme));
   }
 }

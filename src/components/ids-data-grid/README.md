@@ -302,7 +302,7 @@ When used as an attribute in the DOM the settings are kebab case, when used in J
 - `listStyle` {boolean} Sets the style of the grid to list style for simple readonly lists.
 - `columns` {Array<object>} Sets the columns array of the data grid. See column settings.
 - `columnGroups` {Array<object>} Allows you to group columns together in logical sets. See section below for details.
-- `rowHeight` {string | `'xs'` | `'sm'` | `'md'` | `'lg'`} Sets the height of each row
+- `rowHeight` {string | `'xxs'` | `'xs'` | `'sm'` | `'md'` | `'lg'`} Sets the height and padding of each row. In smaller row heights the font is lowered.
 - `data` {Array<object>} Sets the data to show in the data grid. This can be a JSON Array.
 - `disableClientFilter` {boolean} Disables the filter logic client side in situations you want to filter server side.
 - `filterable` {boolean} Turns on or off the filter functionality.
@@ -321,12 +321,13 @@ When used as an attribute in the DOM the settings are kebab case, when used in J
 - `expandableRow` {boolean} Indicates expandable rows will be used in the data grid.  See the expandable row section for more details.
 - `expandableRowTemplate` {string} Should point to the row `template` element for expandable rows.
 - `treeGrid` {boolean} Indicates a tree grid will be used  in the data grid. See the tree grid section for more details.
+- `showHeaderExpander` {boolean} Set to show header expander icon for expandable and tree rows.
 - `groupSelectsChildren` {boolean} If a tree grid has multiple selection, setting this will select all children when a parent is selected.
 - `saveActivePage` {boolean} If set the active page on the pager will be saved to local storage.
 - `saveColumns` {boolean} If set columns will be saved to local storage.
 - `saveFilter` {boolean} If set filter will be saved to local storage.
 - `savePageSize` {boolean} If set the page size on the pager will be saved to local storage.
-- `saveRowHeight` {boolean} If set row height will be saved to local storage.
+- `saveRowHeight` {boolean} If set the row height will be saved to local storage.
 - `saveSortOrder` {boolean} If set column sort order will be saved to local storage.
 - `saveUserSettings` {boolean} If set all settings will be saved to local storage.
 - `emptyMessageDescription` {string} Set empty message description text.
@@ -377,6 +378,7 @@ When used as an attribute in the DOM the settings are kebab case, when used in J
 |`href` | {string|Function} | Used to create the href for hyperlink formatters. This can be a string or a function that can work dynamically. It can also replace `{{value}}` with the current value. |
 |`text` | {string} | Used to create the txt value for hyperlink formatters if a hard coded link text is needed. |
 |`disabled` | {boolean|Function} | Sets the cell contents to disabled, can also use a callback to determine this dynamically. Only checkboxes, radios, buttons and link columns can be disabled at this time. Selection columns require disabled rows in order to not be clickable/selectable. |
+|`uppercase` | {boolean} | Allows you to set the text as uppercase. |
 
 ## Formatters
 
@@ -398,8 +400,8 @@ When used as an attribute in the DOM the settings are kebab case, when used in J
 | `alert` | Displays `ids-alert` element, and the field value will appear in a tooltip. An `icon` option can be provided as an override.|
 | `color` | Displays `ids-color` element. If a `color` option is provided as an override, the field's value will appear in a tooltip. |
 | `icon` | Displays the field value as an `ids-icon`. An `icon` option can be provided as an override, and the field value will appear beside this `icon` override. A `size` option can also be provided. |
-| `favorite` | Displays the field value as a `star-filled` if truthy or `star-outlined` if false. A `size` option can be provided as an override. |
-| `tag` | Displays the field value as an `ids-tag`. A `color` option can be provdied as an override. |
+| `favorite` | Displays the field value as a `star-filled` if true or `star-outlined` if false. A `size` option can be provided as an override. |
+| `tag` | Displays the field value as an `ids-tag`. A `color` option can be provided as an override. |
 | `progress` | Displays the field value as an `ids-progress`. A `text` option can be provided to customize the label. A `color` and `max` option can be provided as overrides. |
 | `rating` | Displays the field value as an `ids-rating`. A `text` option can be provided to customize the label. A `color` and `max` option can be provided as overrides. |
 | `slider` | Displays the field value as an `ids-slider`. A `text` option can be provided to customize the label. A `color`, `max`, `min` and `type` option can be provided as overrides. |
@@ -489,6 +491,7 @@ The formatter is then linked via the column on the formatter setting. When the g
 - `settingschanged` Fires after settings are changed in some way.
 - `scrollstart` Fires when data-grid reaches the topmost row.
 - `scrollend` Fires when data-grid reaches the bottommost row.
+- `afterrendered` Fires after rendered the data grid.
 
 ## Methods
 
@@ -513,7 +516,14 @@ The formatter is then linked via the column on the formatter setting. When the g
 - `cancelCellEdit` Stops editing and reverts the value in the active editor.
 - `resetDirtyCells` Clears all dirty cell indicators.
 - `dirtyCells` Gives a list of all currently dirty cells.
-- `exoprtToExcel(format: 'csv' | 'xlsx', filename: string, keepGridFormatting: boolean)` Export datagrid datasource to an excel file. This keeps grid formatting by default.
+- `exportToExcel(format: 'csv' | 'xlsx', filename: string, keepGridFormatting: boolean)` Export datagrid datasource to an excel file. This keeps grid formatting by default.
+- `collapseAll()` Collapse all expandable or tree rows.
+- `expandAll()` Expand all expandable or tree rows.
+- `toggleAll(opt: boolean)` Toggle collapse/expand all expandable or tree rows. `opt false`: will expand all, `opt: true`: will collapse all
+- `refreshRow` IdsDataGridRow method to refresh row element and its cells.
+- `refreshCell` IdsDataGridCell method to refresh cell element.
+- `updateDataset(row: number, data: Record<string, unknonw>, isClear?: boolean)` Updates datasource for row.
+- `updateDatasetAndRefresh(row: number, data: Record<string, unknonw>, isClear?: boolean)` Updates datasource for row and refreshes row/cells UI.
 
 ## Filters
 
@@ -1259,6 +1269,22 @@ dataGrid.emptyMessageIcon = 'empty-error-loading-new';
 dataGrid.emptyMessageLabel = 'No Data';
 dataGrid.emptyMessageDescription = 'There is no data available.';
 ```
+
+## Row Height
+
+As mentioned in the settings section you can change the row height by setting the rowHeight option.
+
+```html
+     <ids-data-grid id="data-grid-row-height" row-height="md"></ids-data-grid>
+```
+
+Its worth mentioning the characteristics and usage for each one.
+
+Large (`row-height="lg"`) - Row Height is 50. The default row height, header is 16px and body cells are 16px. 16px padding on cells and header. You should use this most of the time if there is plenty of room on the UI and to avoid the UI looking crowded.
+Medium (`row-height="md"`) - Row Height is 40. Header is 16px and body cells are 16px. 12px padding on cells and header. If you need to see a few more rows but still want to avoid a crowded UI, this is the next best option.
+Small (`row-height="sm"`) - Row Height is 35. Header is 16px and body cells are 16px. 8px padding on cells and header. This is the smallest option that is recommended for readability and spacing.
+Extra Small (`row-height="xs"`) - Row Height is 30. Header is 14px and body cells are 14px. 8px padding on cells and header. If you need a very compressed data grid with a lot of data you can use this option. But there is a trade off of bad readability and spacing.
+Extra Extra Small (`row-height="xxs"`) - Row Height is 25. Header is 14px and body cells are 14px. 2px padding on cells and header. Avoid this option as it is very crowded but it is included for edge cases.
 
 ## States and Variations
 

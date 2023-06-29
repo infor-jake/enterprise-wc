@@ -37,7 +37,8 @@ const dataGrid = document.querySelector<IdsDataGrid>('#data-grid-disable-client-
     resizable: true,
     reorderable: true,
     formatter: dataGrid.formatters.text,
-    filterType: dataGrid.filters.text
+    filterType: dataGrid.filters.text,
+    align: 'right'
   });
   columns.push({
     id: 'productId',
@@ -60,6 +61,24 @@ const dataGrid = document.querySelector<IdsDataGrid>('#data-grid-disable-client-
     align: 'center',
     formatter: dataGrid.formatters.text,
     filterType: dataGrid.filters.checkbox
+  });
+  columns.push({
+    id: 'publishDate',
+    name: 'Pub. Date',
+    field: 'publishDate',
+    width: 280,
+    filterType: dataGrid.filters.date,
+    formatter: dataGrid.formatters.date,
+    headerAlign: 'right',
+  });
+  columns.push({
+    id: 'publishTime',
+    name: 'Pub. Time',
+    field: 'publishTime',
+    width: 280,
+    filterType: dataGrid.filters.time,
+    formatter: dataGrid.formatters.time,
+    headerAlign: 'right',
   });
 
   // Do an ajax request

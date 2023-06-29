@@ -62,9 +62,9 @@ As an example for customizing the header color, and text colors you could do som
 
 ```css
 --ids-color-primary: var(--ids-color-azure-70);
---ids-text-color: var(--ids-color-neutral-100);
---ids-input-background-color: var(--ids-color-neutral-00);
---ids-input-border-color: var(--ids-color-neutral-100);
+--ids-color-text: var(--ids-color-neutral-100);
+--ids-input-color-background-default: var(--ids-color-neutral-00);
+--ids-input-color-border-default: var(--ids-color-neutral-100);
 ```
 
 Using this technique one can customize everything from a simple primary color change to an entire new theme for a customer or future themes. We may not have got every component fully them-able the first go so make a request to add any further tokens to the components.
@@ -78,3 +78,17 @@ To set just a personalization color you just have to change the primary color va
 ```
 
 To create a full theme take all the variables in `src/themes/default/ids-theme-default-core.scss` and change the ones you need to create the theme. You only need to include the one you changed. For a non customer theme (Infor based) its recommended you always you the current palette colors as per `ids-color/demos/palette.html`. But note that you can change the entire palette if desired although this is current work in progress due to the need for further refinement.
+
+You can include the initial theme one of two ways.
+
+1. Let the components manage the styles in head manually
+2. If you need to serve the css files in a different way you can include the theme manually as a link. Then the theme switcher will replace the file name section when you use it. Or you could full manage this yourself (replacing the theme file changes theme). For example:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/my-place/themes/ids-theme-default-light.css">
+</head>
+<body>
+```
