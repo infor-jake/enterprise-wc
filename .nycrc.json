@@ -3,10 +3,14 @@
   "include": [
     "src/components/**/*.ts"
   ],
+  "excludeAfterRemap": true,
   "exclude": [
+    "build/development/ids-container",
     "src/components/ids-demo-app",
     "src/components/**/demos/*.ts",
-    "*scss.js"
+    "build/development/**",
+    "*scss.js",
+    "components/enterprise-wc.ts"
   ],
   "reporter": ["html", "lcov", "json"],
   "report-dir": "coverage"

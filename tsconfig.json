@@ -18,7 +18,7 @@
     "sourceMap": false,
     "inlineSourceMap": false,
     "declaration": true,
-    "emitDeclarationOnly": true,
+    "emitDeclarationOnly": false,
     "declarationMap": false,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./build/types",

@@ -4,7 +4,6 @@ node_modules/
 dist
 demo-dist
 coverage
-test/**/diff
 tmp
 app
 .build-report
@@ -13,6 +12,8 @@ build
 out
 meta.json
 build-stats.json
+cypress/videos
+cypress/screenshots
 
 # OS Setting Files
 .DS_Store

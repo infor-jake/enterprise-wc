@@ -55,6 +55,15 @@ module.exports = {
         test: /\.ts?$/,
         use: [
           {
+            loader: '@jsdevtools/coverage-istanbul-loader'
+          }
+        ],
+        exclude: [/node_modules/],
+      },
+      {
+        test: /\.ts?$/,
+        use: [
+          {
             loader: 'esbuild-loader',
             options: {
               loader: 'ts',
