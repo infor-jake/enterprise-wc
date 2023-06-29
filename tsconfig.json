@@ -38,6 +38,7 @@
     "node_modules/@types/node/globals.d.ts",
     "node_modules/typescript/lib/lib.dom.d.ts",
     "node_modules/cypress/types/jquery/misc.d.ts",
+    "src/components/**/demos/side-by-side.ts",
     "build/types",
     "dist",
     "aws",

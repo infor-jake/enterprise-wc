@@ -1,5 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { defineConfig } from 'cypress';
+import { cypressEsbuildPreprocessor } from 'cypress-esbuild-preprocessor';
+import * as path from 'path';
 
 export default defineConfig({
   e2e: {
@@ -16,6 +18,15 @@ export default defineConfig({
           return null;
         },
       });
+
+      on(
+        'file:preprocessor',
+        cypressEsbuildPreprocessor({
+          esbuildOptions: {
+            tsconfig: path.resolve(__dirname, './tsconfig.json'),
+          },
+        }),
+      );
 
       // eslint-disable-next-line global-require
       return require('@cypress/code-coverage/task')(on, config);

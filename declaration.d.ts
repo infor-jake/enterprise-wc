@@ -14,6 +14,7 @@ declare module '*.jpg';
 // For Side by Side Examples
 declare const $: any;
 declare const Soho: any;
+declare const JQuery: any;
 
 // For Tests
 declare const page: any;
