@@ -74,6 +74,7 @@
     // Allow continue in loops
     "no-continue": ["off"]
   },
+  "ignorePatterns": ["src/components/**/demos/side-by-side.ts"],
   "overrides": [{
     "files": ["*.ts"],
     "plugins": [
