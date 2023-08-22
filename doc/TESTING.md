@@ -75,6 +75,11 @@ e2e tests can be best for:
 - Accessibility Scans
 - Visual Tests
 
+## Patterns for converting Jest/Puppeteer to Cypress
+
+- No need for snapshot tests. While these may be possible, dont think they add much value as they frequently need to be updated.
+- [Every assertion available can be seen on this page](https://docs.cypress.io/guides/references/assertions)
+
 ## Visual Regression tests ///// OLD
 
 We are using [percy.io](https://docs.percy.io/docs/puppeteer) for visual regression tests. First run the e2e tests with the special "percy" command `npm run test:visuals`. To run this you need to add the `PERCY_TOKEN` to your bashrc from the [percy settings page](https://percy.io/Infor-Design-System/IDS-Web-Components/settings).

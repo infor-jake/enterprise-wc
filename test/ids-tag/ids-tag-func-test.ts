@@ -16,42 +16,6 @@ describe('IdsTag Component', () => {
     document.body.innerHTML = '';
   });
 
-  it('renders with no errors', () => {
-    const errors = jest.spyOn(global.console, 'error');
-    const elem: any = new IdsTag();
-    document.body.appendChild(elem);
-    elem.remove();
-    expect(document.querySelectorAll('ids-tag').length).toEqual(1);
-    expect(errors).not.toHaveBeenCalled();
-  });
-
-  it('renders correctly', () => {
-    expect(tag.outerHTML).toMatchSnapshot();
-    tag.dismissible = true;
-    expect(tag.outerHTML).toMatchSnapshot();
-
-    tag.dismissible = false;
-    tag.color = 'error';
-    expect(tag.outerHTML).toMatchSnapshot();
-  });
-
-  it('renders success color from an attribute', () => {
-    tag.setAttribute('color', 'success');
-    expect(tag.getAttribute('color')).toEqual('success');
-    expect(tag.color).toEqual('success');
-  });
-
-  it('renders success color from the api', () => {
-    tag.color = 'success';
-    expect(tag.getAttribute('color')).toEqual('success');
-    expect(tag.color).toEqual('success');
-  });
-
-  it('renders error from the api', () => {
-    tag.color = 'error';
-    expect(tag.getAttribute('color')).toEqual('error');
-    expect(tag.color).toEqual('error');
-  });
 
   it('renders error color from the api', () => {
     tag.color = 'error';

@@ -2,6 +2,7 @@
 import { defineConfig } from 'cypress';
 import { cypressEsbuildPreprocessor } from 'cypress-esbuild-preprocessor';
 import * as path from 'path';
+import { sassPlugin } from 'esbuild-sass-plugin';
 
 export default defineConfig({
   e2e: {
@@ -24,6 +25,9 @@ export default defineConfig({
         cypressEsbuildPreprocessor({
           esbuildOptions: {
             tsconfig: path.resolve(__dirname, './tsconfig.json'),
+            plugins: [
+              sassPlugin()
+            ],
           },
         }),
       );

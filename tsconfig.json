@@ -46,9 +46,6 @@
     "scripts/*.js"
   ],
   "types": [
-    "@types/jest",
-    "@types/puppeteer",
-    "@types/jest-axe",
     "cypress",
     "cypress-axe"
   ]
