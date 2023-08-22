@@ -104,6 +104,8 @@ export interface IdsDataGridColumn {
   max?: number;
   /** Mininum value of a range */
   min?: number;
+  /** Adds expand/collapse icon to a column */
+  showHeaderExpander?: boolean;
   /** Allow column sorting */
   sortable?: boolean;
   /** Allow column resizing */
@@ -168,6 +170,10 @@ export interface IdsDataGridColumn {
     autoupdate?: boolean;
     /** If the filter type is "contents" lets you set a blank string to a text value (matched by ID) */
     notFilteredItem?: { value: string, label: string }
+    /** For filter type input, sets the text to all upper case when typed */
+    uppercase?: boolean;
+    /** For filter type input, sets the text max lenght when typed */
+    maxlength?: number;
   };
   /** Lets you make a dynamic filter function */
   filterFunction?: any;

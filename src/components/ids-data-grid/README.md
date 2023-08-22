@@ -102,6 +102,14 @@ Here is a code example for multi select
 ```
 
 ```js
+  dataGrid.addEventListener('beforerowselected', (e: Event) => {
+    console.info(`Before Row Selected`, (<CustomEvent>e).detail);
+    if (Number((e as any).detail.data.book) === 104) {
+      console.error('Row 104 randomly cant be selected');
+      (<CustomEvent>e).detail.response(false);
+    }
+  });
+
   dataGrid.addEventListener('rowselected', (e) => {
     console.info(`Row Selected`, e.detail);
   });
@@ -274,6 +282,8 @@ The following settings are available on editors.
 `editorSettings.mask` Will pass mask settings to the input (if supported).
 `editorSettings.maskOptions` Will pass maskOptions settings to the input (if supported).
 `editorSettings.options` Dataset used for dropdown editor's list box options.
+`editorSettings.maxlength` Sets the input editor's `maxlength` property to the max characters you can type
+`editorSettings.uppercase` Sets the input editor's to all uppercase
 
 When the use clicks in the cell or activates editing with the keyboard with the Enter key and types. The following events will fire.
 
@@ -344,6 +354,7 @@ When used as an attribute in the DOM the settings are kebab case, when used in J
 |`id` | {string} | The unique id of the column. Each column in the grid should have some unique id.|
 |`name` | {string} | The text to show on the header.|
 |`field` | {string} | The name of the field (column) in the data array attached to the grid for example `description`. This can also be nested in an object for example `children.name`. |
+|`showHeaderExpander` | {boolean} | If true, an expand/collapse icon will appear on the column's header.|
 |`sortable` | {boolean} | If false, the column cannot be sorted. When completed a `sorted` event will fire.|
 |`resizable` | {boolean} | If false the column will not be resizable, thus is a fixed size and can never be changed by the user by dragging the left and right edge.  When completed a `columnresized` event will fire. See the `columns-resizable` example for a working example. |
 |`reorderable` | {boolean} | If true the column can be dragged into another position with adjacent columns. When completed a `columnmoved` event will fire. See the `columns-reorderable` example for a working example. This currently does not work with grouped columns. |
@@ -378,7 +389,7 @@ When used as an attribute in the DOM the settings are kebab case, when used in J
 |`href` | {string|Function} | Used to create the href for hyperlink formatters. This can be a string or a function that can work dynamically. It can also replace `{{value}}` with the current value. |
 |`text` | {string} | Used to create the txt value for hyperlink formatters if a hard coded link text is needed. |
 |`disabled` | {boolean|Function} | Sets the cell contents to disabled, can also use a callback to determine this dynamically. Only checkboxes, radios, buttons and link columns can be disabled at this time. Selection columns require disabled rows in order to not be clickable/selectable. |
-|`uppercase` | {boolean} | Allows you to set the text as uppercase. |
+|`uppercase` | {boolean} | Transforms all the text in the cell contents to uppercase. See also filterOptions and editorOptions |
 
 ## Formatters
 
@@ -468,7 +479,9 @@ The formatter is then linked via the column on the formatter setting. When the g
 - `sorted` Fires when the sort column is changed.
 - `selectionchanged` Fires any time the selection changes.
 - `activationchanged` Fires any time the active row changes.
+- `beforerowselected` Fires before each row is selected. You can veto the selection by returning false in the event response for example `e.detail.response(false);`
 - `rowselected` Fires for each row that is selected.
+- `beforerowdeselected` Fires before each row is deselected. You can veto the deselection by returning false in the event response for example `e.detail.response(false);`
 - `rowdeselected` Fires for each row that is deselected.
 - `rowactivated` Fires for each row that is activated.
 - `rowdeactivated` Fires for each row that is deactivated.
@@ -524,6 +537,10 @@ The formatter is then linked via the column on the formatter setting. When the g
 - `refreshCell` IdsDataGridCell method to refresh cell element.
 - `updateDataset(row: number, data: Record<string, unknonw>, isClear?: boolean)` Updates datasource for row.
 - `updateDatasetAndRefresh(row: number, data: Record<string, unknonw>, isClear?: boolean)` Updates datasource for row and refreshes row/cells UI.
+- `updateData(value: string, refresh = true)` IdsDataGridCell method to update datasource on a specific cell.
+- `rowByIndex(rowIndex: number)` method to retrieve a specific row datagrid.
+- `cellByIndex(rowIndex: number, columnIndex: number)` method to retrieve a specific cell from datagrid.
+- `cellByIndex(columnIndex: number)` IdsDataGridRow method to retrieve a specific cell from row.
 
 ## Filters
 
@@ -538,7 +555,7 @@ All the filter settings can be passed thru columns data.
 |`filterType` | Function | Data grid built-in filter method, see the dedicated section below. |
 |`filterConditions` | Array | List of items to be use as operators in menu-button or options in dropdown. |
 |`filterFunction` | Function | User defined filter method, it must return a boolean. |
-|`filterOptions` | Object | Setting for components are in use, for example: `label, placeholder, disabled`. |
+|`filterOptions` | Object | Passes settings in for the filter component example: `label, placeholder, disabled, uppercase, maxlength`. |
 |`isChecked` | Function | User defined filter method, it must return a boolean. This method use along built-in `checkbox` only, when filter data value is not boolean type. |
 
 ### Built-in Filter Methods
@@ -1239,7 +1256,7 @@ Set empty message thru slot (markup).
 <ids-data-grid id="data-grid-em-thru-slot" label="Books">
   <ids-empty-message hidden icon="empty-search-data-new" slot="empty-message">
     <ids-text type="h2" font-size="20" label="true" slot="label">No Data</ids-text>
-    <ids-text hidden label="true" slot="description">There is no data available.</ids-text>
+    <ids-text hidden label="true" slot="description">There is No data available.</ids-text>
   </ids-empty-message>
 </ids-data-grid>
 ```
@@ -1252,7 +1269,7 @@ Set empty message thru settings (markup).
   label="Books"
   empty-message-icon="empty-error-loading-new"
   empty-message-label="No Data"
-  empty-message-description="There is no data available."
+  empty-message-description="There is No data available."
 ></ids-data-grid>
 ```
 
@@ -1267,7 +1284,7 @@ Set empty message thru settings (javascript).
 const dataGrid = document.querySelector('#data-grid-em-thru-settings-js');
 dataGrid.emptyMessageIcon = 'empty-error-loading-new';
 dataGrid.emptyMessageLabel = 'No Data';
-dataGrid.emptyMessageDescription = 'There is no data available.';
+dataGrid.emptyMessageDescription = 'There is No data available.';
 ```
 
 ## Row Height

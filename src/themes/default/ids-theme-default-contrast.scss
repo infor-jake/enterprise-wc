@@ -25,6 +25,7 @@
   --ids-input-color-background-default: var(--ids-color-neutral-00);
   --ids-input-color-border-default: var(--ids-color-neutral-40);
   --ids-input-color-text: var(--ids-color-neutral-100);
+  --ids-input-color-text-placeholder: var(--ids-color-neutral-60);
   --ids-input-label-color-text-default: var(--ids-color-text-label);
   --ids-input-color-border-readonly: var(--ids-color-neutral-40);
   --ids-input-color-text-readonly: var(--ids-color-neutral-100);
@@ -63,6 +64,8 @@
   --ids-shadow-10: 0 0 3px 1px rgb(0 114 237 / 0.3);
   --ids-shadow-20: 0 0 3px 2px rgb(0 114 237 / 0.30);
   --ids-shadow-30: 0 0 4px 3px rgb(0 114 237 / 0.3);
+  --ids-scroll-shadow: 0 -1px 3px -1px rgba(0  0  0 / 0.30);
+  --ids-scroll-color-border-top: 1px solid rgba(215 215 216 / 1);
 
   /// --- Component Tokens ---- ///
   // Accordion
@@ -124,10 +127,18 @@
   --ids-calendar-event-color-border-focus: var(--ids-color-azure-100);
 
   // Card
+  --ids-card-header-title-color: var(--ids-color-neutral-110);
   --ids-card-color-background: var(--ids-color-neutral-00);
-  --ids-card-color-border: var(--ids-color-neutral-60);
+  --ids-card-color-border: var(--ids-color-neutral-80);
   --ids-card-divider-color-border: var(--ids-color-neutral-30);
   --ids-card-shadow: 0 0 8px rgba(0 0 0 / 0.1);
+
+  // Box
+  --ids-box-color-background: var(--ids-card-color-background);
+  --ids-box-color-border: var(--ids-color-neutral-40);
+  --ids-box-shadow: var(--ids-card-shadow);
+  --ids-box-outline-selected: 2px solid var(--ids-color-primary-70);
+  --ids-box-outline-hover: 1px solid var(--ids-color-neutral-80);
 
   // Button (Primary)
   --ids-button-primary-color-border-default: var(--ids-color-primary);
@@ -167,9 +178,11 @@
   --ids-button-destructive-color-background-hover: var(--ids-color-error-10);
 
   // Button (Formatter)
-  --ids-button-formatter-color-text-default: var(--ids-color-neutral-10);
-  --ids-button-formatter-color-border: var(--ids-color-neutral-00);
-  --ids-button-formatter-color-text-hover: var(--ids-color-neutral-00);
+  --ids-button-formatter-color-text-hover: var(--ids-color-neutral-100);
+  --ids-button-formatter-color-text-disabled: var(--ids-color-neutral-60);
+  --ids-button-formatter-color-background-hover: var(--ids-color-neutral-30);
+  --ids-button-formatter-color-active: var(--ids-color-primary-90);
+  --ids-button-formatter-color-text-default: var(--ids-color-neutral-100);
 
   // Charts
   --ids-chart-legend-color-text: var(--ids-color-text);
@@ -205,8 +218,8 @@
   --ids-data-grid-header-color-icon-unsorted: var(--ids-color-neutral-40);
   --ids-data-grid-header-color-icon-sorted: var(--ids-color-neutral-00);
 
-    // Data Grid (Filter)
-    --ids-data-grid-filter-input-color-background-readonly: var(--ids-color-neutral-50);
+  // Data Grid (Filter)
+  --ids-data-grid-filter-input-color-background-readonly: var(--ids-color-neutral-50);
 
   // Data Grid (Rows)
   --ids-data-grid-row-color-background-selected: rgba(85 163 243 / 0.2);
@@ -255,7 +268,6 @@
   --ids-expandable-area-border-bottom: 1px solid var(--ids-color-neutral-60);
 
   // Headers
-  --ids-header-color-background: var(--ids-color-primary);
   --ids-header-gradient-opacity-none: rgb(0 74 153 / 1);
   --ids-header-gradient-opacity-full: rgb(0 114 237 / 0);
 
@@ -265,7 +277,10 @@
   --ids-hyperlink-color-text-disabled: var(--ids-color-neutral-50);
 
   // Icons
-  --ids-icon-color-default: var(--ids-color-neutral-100);
+  --ids-icon-color-default: currentColor;
+
+  // Link List
+  --ids-link-list-title-color-text-default: var(--ids-color-neutral-110);
 
   // Layout Grid
   --ids-layout-grid-color-background: var(--ids-color-neutral-00);
@@ -338,7 +353,7 @@
 
   // Separator
   --ids-separator-color-background: var(--ids-color-neutral-100);
-  --ids-separator-alternate-color-background: var(--ids-color-neutral-00);
+  --ids-separator-alternate-color-background: var(--ids-color-neutral-40);
 
   // Scroll View
   --ids-scroll-view-color-icon-default: var(--ids-color-neutral-60);
@@ -371,6 +386,12 @@
   --ids-splitter-bar-color-border-dragging: var(--ids-color-azure-40);
   --ids-splitter-handle-color-background-hover: var(--ids-color-azure-70);
 
+  // Stats
+  --ids-stats-positive-color-text: var(--ids-color-emerald-80);
+  --ids-stats-negative-color-text: var(--ids-color-error-default);
+  --ids-stats-color-text: var(--ids-color-text-label);
+  --ids-stats-kpi-label-color: var(--ids-color-neutral-110);
+
   // Step Chart
   --ids-step-chart-color-background-default: var(--ids-color-neutral-30);
   --ids-step-chart-color-background-complete: var(--ids-color-primary);
@@ -398,8 +419,10 @@
 
   // Tab
   --ids-tab-focus-hide-border-color: var(--ids-color-primary);
-  --ids-tab-module-color-background-default: var(--ids-color-azure-80);
-  --ids-tab-module-color-background-selected: var(--ids-color-azure-60);
+
+  // Tab (Module Variant)
+  --ids-tab-module-color-background-default: var(--ids-color-neutral-20);
+  --ids-tab-module-color-background-selected: var(--ids-color-neutral-00);
 
   // Tag
   --ids-tag-color-background-default: var(--ids-input-color-background-readonly);
@@ -424,8 +447,9 @@
   // Toast
   --ids-toast-progress-color-background: var(--ids-progress-bar-fill-color-background);
 
-  // Toolbar
-  --ids-toolbar-formatter-color-background: var(--ids-color-neutral-70);
+  // Toolbar (Formatter)
+  --ids-toolbar-formatter-color-background: var(--ids-color-neutral-20);
+  --ids-toolbar-formatter-color-border-bottom: var(--ids-color-neutral-40);
 
   // Trigger Field
   --ids-trigger-field-icon-color: var(--ids-color-neutral-80);
@@ -456,6 +480,12 @@
   --ids-week-view-color-border: var(--ids-color-neutral-30);
   --ids-week-view-header-color-background: var(--ids-color-neutral-00);
   --ids-week-view-row-odd-color-border: var(--ids-color-neutral-20);
+
+  // Widget
+  --ids-widget-header-title-color: var(--ids-color-neutral-110);
+  --ids-widget-color-border-hover: var(--ids-color-neutral-40);
+  --ids-widget-color-shadow-hover: 0 2px 4px 1px rgba(0 0 0 / 0.15);
+  --ids-widget-search-field-color-background: var(--ids-color-neutral-20);
 
   // Wizard
   --ids-wizard-step-color-default: var(--ids-color-primary);
