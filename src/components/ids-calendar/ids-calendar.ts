@@ -205,7 +205,6 @@ export default class IdsCalendar extends Base {
    */
   connectedCallback(): void {
     super.connectedCallback();
-    this.setDirection();
     this.changeView('month');
     this.#attachEventHandlers();
     this.#configureResizeObserver();
@@ -228,8 +227,13 @@ export default class IdsCalendar extends Base {
    * Configures IdsCalendar's resize observer
    */
   #configureResizeObserver() {
-    this.#resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => this.#onResize(entries));
-    this.#resizeObserver.observe(getClosest(this, 'ids-container'));
+    const observedElem = getClosest(this, 'ids-container') || this.container;
+    let rafRef: number;
+    this.#resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+      cancelAnimationFrame(rafRef);
+      rafRef = requestAnimationFrame(() => this.#onResize(entries));
+    });
+    this.#resizeObserver.observe(observedElem);
   }
 
   /**

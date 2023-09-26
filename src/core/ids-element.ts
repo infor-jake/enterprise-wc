@@ -1,3 +1,4 @@
+import IdsGlobal from '../components/ids-global/ids-global';
 import { camelCase } from '../utils/ids-string-utils/ids-string-utils';
 
 export type IdsBaseConstructor = new (...args: any[]) => IdsElement;
@@ -234,6 +235,8 @@ export default class IdsElement extends HTMLElement {
     if (this.lastTheme === theme) return;
     this.lastTheme = theme;
 
+    const themeLoaded = IdsGlobal.onThemeLoaded();
+
     // Handle setting theme via links
     document.querySelector('ids-container')?.setAttribute('hidden', '');
     const themeLink = document.querySelector('link[href*="ids-theme"]');
@@ -243,6 +246,7 @@ export default class IdsElement extends HTMLElement {
       themeLink.setAttribute('href', href?.replace(filename, `ids-theme-${theme}.css`) || '');
       setTimeout(() => {
         document.querySelector('ids-container')?.removeAttribute('hidden');
+        themeLoaded.resolve();
       }, 150);
       return;
     }
@@ -256,7 +260,18 @@ export default class IdsElement extends HTMLElement {
     const head = (document.head as any);
     const styleElem = document.querySelector('#ids-theme');
     const style = styleElem || document.createElement('style');
-    style.textContent = themeStyles;
+
+    const localeFonts = `
+      html[lang='ar'] {--ids-font-family-default: var(--ids-font-family-ar)}
+      html[lang='he'] {--ids-font-family-default: var(--ids-font-family-he)}
+      html[lang='hi'] {--ids-font-family-default: var(--ids-font-family-hi)}
+      html[lang='ja'] {--ids-font-family-default: var(--ids-font-family-ja)}
+      html[lang='ko'] {--ids-font-family-default: var(--ids-font-family-ko)}
+      html[lang='th'] {--ids-font-family-default: var(--ids-font-family-th)}
+      html[lang='zh-Hans'] {--ids-font-family-default: var(--ids-font-family-zh-hans)}
+      html[lang='zh-Hant'] {--ids-font-family-default: var(--ids-font-family-zh-hant)}
+    `;
+    style.textContent = `${themeStyles}${localeFonts}`;
     style.id = 'ids-theme';
     if (this.nonce) style.setAttribute('nonce', this.nonce);
     if (!styleElem) {
@@ -265,9 +280,9 @@ export default class IdsElement extends HTMLElement {
       else head.insertAdjacentHTML('beforeend', style);
     }
     this.loadLegacyTheme(theme);
-    document.querySelector('ids-container')?.setAttribute('animated', '');
     setTimeout(() => {
       document.querySelector('ids-container')?.removeAttribute('hidden');
+      themeLoaded.resolve();
     }, 150);
   }
 

@@ -4,15 +4,28 @@
 
 ### 1.0.0-beta.15 Features
 
+- `[AppNav]` Fixed an issue when loading in angular templates/router-outlets. ([#1428](https://github.com/infor-design/enterprise-wc/issues/1428))
+- `[Calendar]` Fix calendar dependency on ids container. ([#1359](https://github.com/infor-design/enterprise-wc/issues/1359))
+- `[DataGrid]` Treegrid `appendData()` no longer breaks rendering of existing rows, and `scrollend` triggers properly. ([#1425](https://github.com/infor-design/enterprise-wc/issues/1425))
 - `[DataGrid]` Prevent scroll when resize columns. ([#1209](https://github.com/infor-design/enterprise-wc/issues/1209))
+- `[DataGrid]` Added new colored header and related styles. ([#1285](https://github.com/infor-design/enterprise-wc/issues/1285))
+- `[DataGrid]` Fix virtual/infinite scroll when max rows in dom reached. ([#1454](https://github.com/infor-design/enterprise-wc/issues/1454))
 - `[Editor]` Added new toolbar styles in all themes. ([#7606](https://github.com/infor-design/enterprise-wc/issues/7606))
 - `[Editor]` Fixed issue where buttons are disabled in source view. ([#1195](https://github.com/infor-design/enterprise-wc/issues/1195))
+- `[Icons]` Fixes for new icons pipeline, new icons and cleanup. ([#518](https://github.com/infor-design/design-system/issues/518))
+- `[Locale]` Made Locale a global instance and moved it off ids-container and related fixes. ([#663](https://github.com/infor-design/enterprise-wc/issues/663))
 - `[Message]` Fix modal button separator. ([#1414](https://github.com/infor-design/enterprise-wc/issues/1414))
 - `[ModuleNav]` Added IdsModuleNav component with basic Role Switcher, Settings component. ([#1226](https://github.com/infor-design/enterprise-wc/issues/1226))
+- `[ModuleNav]` Add Dark/Contrast themes, app icons, tooltip support, and other features to IdsModuleNav. ([#1417](https://github.com/infor-design/enterprise-wc/issues/1414))
+- `[NotificationBanner]` Added `wrap` setting for notification banner. ([#1435](https://github.com/infor-design/enterprise-wc/issues/1435))
+- `[PopupMenu]` Add support for RTL. ([#1429](https://github.com/infor-design/enterprise-wc/issues/1429))
 - `[Toolbar]` Added tooltip to the more button on toolbars. ([#1318](https://github.com/infor-design/enterprise-wc/issues/1318))
 
 ### 1.0.0-beta.15 Fixes
 
+- `[DataGrid]` Fixed duplicate filter menus ([#1258](https://github.com/infor-design/enterprise-wc/issues/1258))
+- `[DataGrid]` Fixed missing/incorrect event handling in some cases with built-in filter menus/pickers. ([#1291](https://github.com/infor-design/enterprise-wc/issues/1291))
+- `[DataGrid]` Fixed incorrect placement of slotted filter menus/pickers. ([#1297](https://github.com/infor-design/enterprise-wc/issues/1297))
 - `[DataGrid]` Added example that shows context-menu with option to activate cell edit-mode on right-click. ([#1319](https://github.com/infor-design/enterprise-wc/issues/1319))
 
 ## 1.0.0-beta.14
@@ -46,6 +59,7 @@
 - `[DataGrid]` Fixed an issue with the newer `maxlength` setting as it was not working in safari. ([#1403](https://github.com/infor-design/enterprise-wc/issues/1403))
 - `[DataGrid]` Added `column.showHeaderExpander` setting to `IdsDataGridColumn`. ([#1360](https://github.com/infor-design/enterprise-wc/issues/1360))
 - `[DataGrid]` Fixed tooltip callback/async-callback does not show tooltip for the header. ([#1311](https://github.com/infor-design/enterprise-wc/issues/1311))
+- `[DataGrid]` Fixed cut-off Date/Time picker popups. ([#1298](https://github.com/infor-design/enterprise-wc/issues/1298))
 - `[General]` Fixed issue with camel casing for HTML intellisense. ([#1385](https://github.com/infor-design/enterprise-wc/issues/1385))
 - `[LayoutGrid]` Added breakpoint sizes for the flow attribute in the grid-layout. ([#1405](https://github.com/infor-design/enterprise-wc/issues/1405))
 - `[ListView]` Added support for `ids-list-view-item` child component. ([#1042](https://github.com/infor-design/enterprise-wc/issues/1042))
