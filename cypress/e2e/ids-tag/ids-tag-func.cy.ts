@@ -5,23 +5,9 @@ describe('IdsTag functional tests', () => {
   let tag: IdsTag;
 
   beforeEach(() => {
-    tag = new IdsTag();
-    document.body.appendChild(tag);
     cy.visit(url);
-  });
-
-  // TODO? Is this an e2e test?
-  describe('general component tests', () => {
-    it('renders with no errors', () => {
-      cy.document().then((doc: Document) => {
-        const elem: any = new IdsTag();
-        doc.body.appendChild(elem);
-        elem.setAttribute('id', 'test');
-      });
-
-      cy.get('#test')
-        .invoke('attr', 'color')
-        .should('eq', undefined);
+    cy.get('ids-tag').first().then((el) => {
+      tag = el.get(0) as IdsTag;
     });
   });
 
@@ -36,6 +22,12 @@ describe('IdsTag functional tests', () => {
       tag.setAttribute('color', 'success');
       expect(tag.getAttribute('color')).to.equal('success');
       expect(tag.color).to.equal('success');
+    });
+
+    it('works with null success color', () => {
+      tag.color = null;
+      expect(tag.getAttribute('color')).to.equal(null);
+      expect(tag.color).to.equal(null);
     });
 
     it('renders success color from the api', () => {
@@ -61,12 +53,19 @@ describe('IdsTag functional tests', () => {
     it('can get clickable', () => {
       expect(tag.clickable).to.equal(false);
     });
+
+    it('can set clickable to false', () => {
+      tag.clickable = true;
+      expect(tag.getAttribute('clickable')).to.equal('true');
+      tag.clickable = false;
+      expect(tag.getAttribute('clickable')).to.equal(null);
+    });
   });
 
   describe('method tests', () => {
-    it('should cancel dismiss when not dismissible', () => {
+    it('should remove on dismiss', () => {
       tag.dismiss();
-      expect(document.body.contains(tag)).to.equal(true);
+      expect(document.body.contains(tag)).to.equal(false);
     });
   });
 });
